@@ -3,6 +3,7 @@ import sys
 
 cwarning_uniq = dict()
 
+
 class CWarning:
     def __init__(self, id, desc, source, place):
         self.id = id
@@ -63,9 +64,12 @@ class CWStatistics:
 
         filename = CWarning.get_filename(cwarning.place)
         if filename not in self.by_file:
-            self.by_file[filename] = 1
-        else:
-            self.by_file[filename] += 1
+            self.by_file[filename] = dict()
+
+        if cwarning.id not in self.by_file[filename]:
+            self.by_file[filename][cwarning.id] = 1
+
+        self.by_file[filename][cwarning.id] += 1
 
 
 class WorksheetExt:
@@ -93,6 +97,7 @@ if __name__ == "__main__":
 
     hcell_format.set_pattern(1)  # This is optional when using a solid fill.
     hcell_format.set_bg_color('#CEF6CE')
+    hcell_format.set_bold()
 
     # Set the columns widths.
     files_dict = dict()
@@ -144,6 +149,18 @@ if __name__ == "__main__":
         statistics_wb.write(row, 0, key)
         statistics_wb.write(row, 1, statistics.by_id[key])
         row += 1
+
+    statistics_wb.write(row, 0, "FILE", hcell_format)
+    statistics_wb.write(row, 1, "Warnings", hcell_format)
+    row += 1
+
+    for key in statistics.by_file.keys():
+        statistics_wb.write(row, 0, key, hcell_format)
+        row += 1
+        for id in statistics.by_file[key].keys():
+            statistics_wb.write(row, 0, id)
+            statistics_wb.write(row, 1, statistics.by_file[key][id])
+            row += 1
     workbook.close()
 
 
