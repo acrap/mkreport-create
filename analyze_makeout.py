@@ -58,6 +58,18 @@ class CWStatistics:
             self.by_file[filename] += 1
 
 
+class WorksheetExt:
+    def __init__(self, worksheet):
+        self.worksheet = worksheet
+        self.row = 0
+
+    def row_inc(self):
+        self.row += 1
+
+    def get_row(self):
+        return self.row
+
+
 if __name__ == "__main__":
     '''
     if len(sys.argv)<2:
@@ -92,20 +104,23 @@ if __name__ == "__main__":
 
                 if place not in files_dict:
                     row = 1
-                    files_dict[place] = workbook.add_worksheet(place)
-                    files_dict[place].set_column('A:G', 50)
-                    files_dict[place].write(0, 0, "id", hcell_format)
-                    files_dict[place].write(0, 1, "desc", hcell_format)
-                    files_dict[place].write(0, 2, "place", hcell_format)
-                    files_dict[place].write(0, 3, "source", hcell_format)
+                    sheet = workbook.add_worksheet(place)
+                    files_dict[place] = WorksheetExt(sheet)
+                    files_dict[place].worksheet.set_column('A:G', 50)
+                    files_dict[place].worksheet.write(0, 0, "id", hcell_format)
+                    files_dict[place].worksheet.write(0, 1, "desc", hcell_format)
+                    files_dict[place].worksheet.write(0, 2, "place", hcell_format)
+                    files_dict[place].worksheet.write(0, 3, "source", hcell_format)
+                    files_dict[place].row_inc()
 
                 id = CWarning.get_id(line)
                 if len(id) == 0:
                     pass
 
                 warning = CWarning(id, CWarning.get_desc(line), lines[i+1].replace("\n", ""), place_with_line_column)
-                warning.write_to_book(files_dict[place], row)
-                row += 1
+                warning.write_to_book(files_dict[place].worksheet, files_dict[place].get_row())
+                files_dict[place].row_inc()
+
                 statistics.add_warning(warning)
 
     # generate separate list for statistics
