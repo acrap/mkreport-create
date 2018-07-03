@@ -128,8 +128,6 @@ if __name__ == "__main__":
                     files_dict[place].row_inc()
 
                 id = CWarning.get_id(line)
-                if len(id) == 0:
-                    pass
 
                 if CWarning.is_unique(place_with_line_column + lines[i+1]):
                     warning = CWarning(id, CWarning.get_desc(line), lines[i+1].replace("\n", ""), place_with_line_column)
