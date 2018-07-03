@@ -1,6 +1,7 @@
 import xlsxwriter
 import sys
 
+cwarning_uniq = dict()
 
 class CWarning:
     def __init__(self, id, desc, source, place):
@@ -14,6 +15,15 @@ class CWarning:
         worksheet.write(row, 1, self.desc)
         worksheet.write(row, 2, self.place)
         worksheet.write(row, 3, self.source)
+
+    @staticmethod
+    def is_unique(place):
+        global cwarning_uniq
+
+        if place not in cwarning_uniq:
+            cwarning_uniq[place] = 1
+            return True
+        return False
 
     @staticmethod
     def get_id(line):
@@ -71,11 +81,11 @@ class WorksheetExt:
 
 
 if __name__ == "__main__":
-    '''
+
     if len(sys.argv)<2:
         print("pass path to make output file as argument")
         sys.exit(1)
-    '''
+
     statistics = CWStatistics()
     workbook = xlsxwriter.Workbook('Report.xlsx')
 
@@ -87,8 +97,7 @@ if __name__ == "__main__":
     # Set the columns widths.
     files_dict = dict()
 
-    #with open(sys.argv[1], "r") as makeout:
-    with open("make_errors", "r") as makeout:
+    with open(sys.argv[1], "r") as makeout:
         row = 0
         lines = makeout.readlines()
         for i in range(0, len(lines)):
@@ -117,11 +126,12 @@ if __name__ == "__main__":
                 if len(id) == 0:
                     pass
 
-                warning = CWarning(id, CWarning.get_desc(line), lines[i+1].replace("\n", ""), place_with_line_column)
-                warning.write_to_book(files_dict[place].worksheet, files_dict[place].get_row())
-                files_dict[place].row_inc()
+                if CWarning.is_unique(place_with_line_column + lines[i+1]):
+                    warning = CWarning(id, CWarning.get_desc(line), lines[i+1].replace("\n", ""), place_with_line_column)
+                    warning.write_to_book(files_dict[place].worksheet, files_dict[place].get_row())
+                    files_dict[place].row_inc()
 
-                statistics.add_warning(warning)
+                    statistics.add_warning(warning)
 
     # generate separate list for statistics
     statistics_wb = workbook.add_worksheet("Total")
