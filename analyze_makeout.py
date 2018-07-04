@@ -136,10 +136,6 @@ class WorksheetExt:
 
 
 if __name__ == "__main__":
-
-    #test_str = ',error,"=HYPERLINK(""https://www.viva64.com/en/w/v114/"", ""V114"")","Dangerous explicit type pointer conversion: (int *) & val","=HYPERLINK(""file:///home/andrey/alexeyd_MW_2_internal_next/vobs/MW/DMAE/user_commands.c"", "" Open file"")","1829",/home/andrey/alexeyd_MW_2_internal_next/vobs/MW/DMAE/user_commands.c'
-    #analyze_pvs_report_line(test_str)
-
     pvs_report = None
     if len(sys.argv) < 2:
         print("pass path to make output file as argument")
@@ -163,7 +159,7 @@ if __name__ == "__main__":
     shcell_format.set_bold()
 
     # Set the columns widths.
-    files_dict = dict()
+    extwsheet_dict = dict()
 
     with open(sys.argv[1], "r") as makeout:
         row = 0
@@ -179,19 +175,19 @@ if __name__ == "__main__":
                 place_with_line_column = place[start_ind:]
                 place = place[start_ind:place.index(":")]
 
-                if place not in files_dict:
+                if place not in extwsheet_dict:
                     sheet = workbook.add_worksheet(place)
-                    files_dict[place] = WorksheetExt(sheet)
-                    files_dict[place].worksheet.set_column('A:G', 50)
-                    files_dict[place].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
-                    files_dict[place].add_subheader("Compiler warnings:", shcell_format)
+                    extwsheet_dict[place] = WorksheetExt(sheet)
+                    extwsheet_dict[place].worksheet.set_column('A:G', 50)
+                    extwsheet_dict[place].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
+                    extwsheet_dict[place].add_subheader("Compiler warnings:", shcell_format)
 
                 id = CWarning.get_id(line)
 
                 if CWarning.is_unique(place_with_line_column + lines[i+1]):
                     warning = CWarning(id, CWarning.get_desc(line), lines[i+1].replace("\n", ""), place_with_line_column)
-                    warning.write_to_book(files_dict[place].worksheet, files_dict[place].get_row())
-                    files_dict[place].row_inc()
+                    warning.write_to_book(extwsheet_dict[place].worksheet, extwsheet_dict[place].get_row())
+                    extwsheet_dict[place].row_inc()
 
                     statistics.add_warning(warning)
 
@@ -202,26 +198,26 @@ if __name__ == "__main__":
             if warn is None:
                 continue
             filename = CWarning.get_filename(warn.place)
-            if filename not in files_dict:
+            if filename not in extwsheet_dict:
                 sheet = workbook.add_worksheet(filename)
-                files_dict[filename] = WorksheetExt(sheet)
-                files_dict[filename].worksheet.set_column('A:G', 50)
-                files_dict[filename].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
+                extwsheet_dict[filename] = WorksheetExt(sheet)
+                extwsheet_dict[filename].worksheet.set_column('A:G', 50)
+                extwsheet_dict[filename].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
 
-            if not files_dict[filename].is_pvs:
-                files_dict[filename].add_pvs(shcell_format)
+            if not extwsheet_dict[filename].is_pvs:
+                extwsheet_dict[filename].add_pvs(shcell_format)
 
-            warn.write_to_book(files_dict[filename].worksheet, files_dict[filename].get_row())
+            warn.write_to_book(extwsheet_dict[filename].worksheet, extwsheet_dict[filename].get_row())
             statistics.add_warning(warn)
-            files_dict[filename].row_inc()
+            extwsheet_dict[filename].row_inc()
         pvs_report.close()
 
     # generate separate list for statistics
     statistics_wb = workbook.add_worksheet("Total")
 
     row = 1
-    statistics_wb.set_column('A:A', 30)
-    statistics_wb.set_column('B:C', 80)
+    statistics_wb.set_column('A:A', 50)
+    statistics_wb.set_column('B:B', 80)
 
     statistics_wb.write(0, 0, "ID", hcell_format)
     statistics_wb.write(0, 1, "Repeats", hcell_format)
@@ -235,12 +231,34 @@ if __name__ == "__main__":
     statistics_wb.write(row, 2, "Repeats", hcell_format)
     row += 1
 
+    format1 = workbook.add_format()
+    format2 = workbook.add_format()
+
+    format1.set_pattern(1)  # This is optional when using a solid fill.
+    format1.set_bg_color('#F2F2F2')
+    format1.set_bold()
+    format1.set_border(1)
+    format1.set_border_color("#000000")
+
+    format2.set_pattern(1)  # This is optional when using a solid fill.
+    format2.set_bg_color('#D8D8D8')
+    format2.set_bold()
+    format2.set_border(1)
+    format2.set_border_color("#000000")
+
+    current_format = format1
+
     for key in statistics.by_file.keys():
-        statistics_wb.write(row, 0, key)
+        statistics_wb.write(row, 0, key, current_format)
         for id in statistics.by_file[key].keys():
-            statistics_wb.write(row, 1, id)
-            statistics_wb.write(row, 2, statistics.by_file[key][id])
+            statistics_wb.write(row, 1, id, current_format)
+            statistics_wb.write(row, 2, statistics.by_file[key][id], current_format)
             row += 1
+            statistics_wb.write(row, 0, "", current_format)
+        if current_format == format1:
+            current_format = format2
+        else:
+            current_format = format1
 
     workbook.close()
 
