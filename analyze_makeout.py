@@ -1,59 +1,8 @@
 import xlsxwriter
 import sys
-
-cwarning_uniq = dict()
-
-
-class CWarning:
-    def __init__(self, id, desc, source, place):
-        self.id = id
-        self.desc = desc
-        self.source = source
-        self.place = place
-
-    def write_to_book(self, worksheet, row):
-        worksheet.write(row, 0, self.id)
-        worksheet.write(row, 1, self.desc)
-        worksheet.write(row, 2, self.place)
-        worksheet.write(row, 3, self.source)
-
-    @staticmethod
-    def is_unique(place):
-        global cwarning_uniq
-
-        if place not in cwarning_uniq:
-            cwarning_uniq[place] = 1
-            return True
-        return False
-
-    @staticmethod
-    def get_id(line):
-        start_ind = line.index("[")
-        end_ind = line.index("]") + 1
-        return line[start_ind:end_ind]
-
-    @staticmethod
-    def get_desc(line):
-        start_ind = line.index("warning:")
-        end_ind = line.index(" [") + 1
-        return line[start_ind+8:end_ind]
-
-    @staticmethod
-    def get_place(line):
-        end_ind = line.index(": ")
-        return line[0:end_ind]
-
-    @staticmethod
-    def get_filename(place):
-        start_ind = 0
-        if place.find("/") >= 0:
-            start_ind = place.rindex("/") + 1
-        if place.find(":") == -1:
-            res = place[start_ind:]
-        else:
-            res = place[start_ind:place.index(":")]
-        res = res.replace("\n", "")
-        return res
+from cwarning import CWarning
+from cwstatistics import CWStatistics
+from worksheet_ext import WorksheetExt
 
 
 def analyze_pvs_report_line(line):
@@ -74,65 +23,6 @@ def analyze_pvs_report_line(line):
         source = ""
     warn = CWarning(id, desc, source, place)
     return warn
-
-
-class CWStatistics:
-    def __init__(self):
-        self.by_id = dict()
-        self.by_file = dict()
-
-    def add_warning(self, cwarning):
-        # add description to PVS warnings id's
-        if cwarning.id.find("V") != -1:
-            cwarning.id = cwarning.id + "(" + cwarning.desc + ")"
-
-        if cwarning.id not in self.by_id:
-            self.by_id[cwarning.id] = 1
-        else:
-            self.by_id[cwarning.id] += 1
-
-        filename = CWarning.get_filename(cwarning.place)
-        if filename not in self.by_file:
-            self.by_file[filename] = dict()
-
-        if cwarning.id not in self.by_file[filename]:
-            self.by_file[filename][cwarning.id] = 1
-
-        self.by_file[filename][cwarning.id] += 1
-
-
-class WorksheetExt:
-    def __init__(self, worksheet):
-        self.worksheet = worksheet
-        self.row = 0
-        self.is_pvs = False
-
-    def row_inc(self):
-        self.row += 1
-
-    def get_row(self):
-        return self.row
-
-    def is_pvs_added(self):
-        return self.is_pvs
-
-    def add_header_row(self, hlist, hformat):
-        column = 0
-        for item in hlist:
-            self.worksheet.write(self.row, column, item, hformat)
-            column += 1
-        self.row_inc()
-
-    def add_subheader(self, text, cformat):
-        self.row_inc()
-        self.worksheet.write(self.row, 0, text, cformat)
-        for i in range(1, 4):
-            self.worksheet.write(self.row, i, "", cformat)
-        self.row_inc()
-
-    def add_pvs(self, cformat):
-        self.is_pvs = True
-        self.add_subheader("PVS Report:", cformat)
 
 
 if __name__ == "__main__":
