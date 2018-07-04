@@ -27,9 +27,12 @@ class CWarning:
 
     @staticmethod
     def get_id(line):
-        start_ind = line.index("[")
-        end_ind = line.index("]") + 1
-        return line[start_ind:end_ind]
+        try:
+            start_ind = line.index("[")
+            end_ind = line.index("]") + 1
+            return line[start_ind:end_ind]
+        except Exception:
+            return None
 
     @staticmethod
     def get_desc(line):
