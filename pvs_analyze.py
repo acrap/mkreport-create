@@ -22,7 +22,7 @@ def analyze_pvs_report_line(line):
     return warn
 
 
-def add_pvs_warnings_to_report(wbook, report_file, header_format, subheader_format, worksheet_dict, stats, only_stat):
+def analyze_pvs_report(wbook, report_file, header_format, subheader_format, worksheet_dict, stats, only_stat):
     pvs_lines = report_file.readlines()
     for line in pvs_lines[2:]:
         warn = analyze_pvs_report_line(line)
