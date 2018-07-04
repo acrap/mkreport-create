@@ -3,27 +3,7 @@ import sys
 from cwarning import CWarning
 from cwstatistics import CWStatistics
 from worksheet_ext import WorksheetExt
-
-
-def analyze_pvs_report_line(line):
-    columns = line.split(",")
-
-    try:
-        id = columns[3].replace('"', "").replace(")", "")
-    except Exception:
-        return None
-    place = CWarning.get_filename(columns[8]) + ":" + columns[7].replace('"', "")
-    if columns[4].find(":") > -1:
-        desc = columns[4][1:columns[4].index(":")]
-    else:
-        desc = columns[4][1:].replace('"', "")
-    try:
-        source = columns[4][columns[4].index(":")+1:len(columns[4])-1]
-    except Exception:
-        source = ""
-    warn = CWarning(id, desc, source, place)
-    return warn
-
+from pvs_analyze import analyze_pvs_report_line
 
 if __name__ == "__main__":
     pvs_report = None
@@ -34,13 +14,15 @@ if __name__ == "__main__":
         pvs_report = open(sys.argv[2], "r")
 
     statistics = CWStatistics()
+
     workbook = xlsxwriter.Workbook('Report.xlsx')
 
     hcell_format = workbook.add_format()
 
     hcell_format.set_pattern(1)  # This is optional when using a solid fill.
-    hcell_format.set_bg_color('#CEF6CE')
+    hcell_format.set_bg_color('#6E6E6E')
     hcell_format.set_bold()
+    hcell_format.set_font_color("#FAFAFA")
 
     shcell_format = workbook.add_format()
 
@@ -124,13 +106,11 @@ if __name__ == "__main__":
     format1 = workbook.add_format()
     format2 = workbook.add_format()
 
-    format1.set_pattern(1)  # This is optional when using a solid fill.
     format1.set_bg_color('#F2F2F2')
     format1.set_bold()
     format1.set_border(1)
     format1.set_border_color("#000000")
 
-    format2.set_pattern(1)  # This is optional when using a solid fill.
     format2.set_bg_color('#D8D8D8')
     format2.set_bold()
     format2.set_border(1)
