@@ -48,7 +48,32 @@ class CWarning:
         start_ind = 0
         if place.find("/") >= 0:
             start_ind = place.rindex("/") + 1
-        return place[start_ind:place.index(":")]
+        if place.find(":") == -1:
+            res = place[start_ind:]
+        else:
+            res = place[start_ind:place.index(":")]
+        res = res.replace("\n", "")
+        return res
+
+
+def analyze_pvs_report_line(line):
+    columns = line.split(",")
+
+    try:
+        id = columns[3].replace('"', "").replace(")", "")
+    except Exception:
+        return None
+    place = CWarning.get_filename(columns[8]) + ":" + columns[7].replace('"', "")
+    if columns[4].find(":") > -1:
+        desc = columns[4][1:columns[4].index(":")]
+    else:
+        desc = columns[4][1:].replace('"', "")
+    try:
+        source = columns[4][columns[4].index(":")+1:len(columns[4])-1]
+    except Exception:
+        source = ""
+    warn = CWarning(id, desc, source, place)
+    return warn
 
 
 class CWStatistics:
@@ -57,6 +82,10 @@ class CWStatistics:
         self.by_file = dict()
 
     def add_warning(self, cwarning):
+        # add description to PVS warnings id's
+        if cwarning.id.find("V") != -1:
+            cwarning.id = cwarning.id + "(" + cwarning.desc + ")"
+
         if cwarning.id not in self.by_id:
             self.by_id[cwarning.id] = 1
         else:
@@ -76,6 +105,7 @@ class WorksheetExt:
     def __init__(self, worksheet):
         self.worksheet = worksheet
         self.row = 0
+        self.is_pvs = False
 
     def row_inc(self):
         self.row += 1
@@ -83,12 +113,32 @@ class WorksheetExt:
     def get_row(self):
         return self.row
 
+    def is_pvs_added(self):
+        return self.is_pvs
+
+    def add_subheader(self, text, cformat):
+        self.row_inc()
+        self.worksheet.write(self.row, 0, text, cformat)
+        for i in range(1, 4):
+            self.worksheet.write(self.row, i, "", cformat)
+        self.row_inc()
+
+    def add_pvs(self, cformat):
+        self.is_pvs = True
+        self.add_subheader("PVS Report:", cformat)
+
 
 if __name__ == "__main__":
 
-    if len(sys.argv)<2:
+    #test_str = ',error,"=HYPERLINK(""https://www.viva64.com/en/w/v114/"", ""V114"")","Dangerous explicit type pointer conversion: (int *) & val","=HYPERLINK(""file:///home/andrey/alexeyd_MW_2_internal_next/vobs/MW/DMAE/user_commands.c"", "" Open file"")","1829",/home/andrey/alexeyd_MW_2_internal_next/vobs/MW/DMAE/user_commands.c'
+    #analyze_pvs_report_line(test_str)
+
+    pvs_report = None
+    if len(sys.argv) < 2:
         print("pass path to make output file as argument")
         sys.exit(1)
+    if len(sys.argv) > 2:
+        pvs_report = open(sys.argv[2], "r")
 
     statistics = CWStatistics()
     workbook = xlsxwriter.Workbook('Report.xlsx')
@@ -98,6 +148,12 @@ if __name__ == "__main__":
     hcell_format.set_pattern(1)  # This is optional when using a solid fill.
     hcell_format.set_bg_color('#CEF6CE')
     hcell_format.set_bold()
+
+    shcell_format = workbook.add_format()
+
+    shcell_format.set_pattern(1)  # This is optional when using a solid fill.
+    shcell_format.set_bg_color('#81F7D8')
+    shcell_format.set_bold()
 
     # Set the columns widths.
     files_dict = dict()
@@ -126,6 +182,7 @@ if __name__ == "__main__":
                     files_dict[place].worksheet.write(0, 2, "place", hcell_format)
                     files_dict[place].worksheet.write(0, 3, "source", hcell_format)
                     files_dict[place].row_inc()
+                    files_dict[place].add_subheader("Compiler warnings:", shcell_format)
 
                 id = CWarning.get_id(line)
 
@@ -136,11 +193,37 @@ if __name__ == "__main__":
 
                     statistics.add_warning(warning)
 
+    if pvs_report is not None:
+        pvs_lines = pvs_report.readlines()
+        for line in pvs_lines[2:]:
+            warn = analyze_pvs_report_line(line)
+            if warn is None:
+                continue
+            filename = CWarning.get_filename(warn.place)
+            if not filename in files_dict:
+                row = 1
+                sheet = workbook.add_worksheet(filename)
+                files_dict[filename] = WorksheetExt(sheet)
+                files_dict[filename].worksheet.set_column('A:G', 50)
+                files_dict[filename].worksheet.write(0, 0, "id", hcell_format)
+                files_dict[filename].worksheet.write(0, 1, "desc", hcell_format)
+                files_dict[filename].worksheet.write(0, 2, "place", hcell_format)
+                files_dict[filename].worksheet.write(0, 3, "source", hcell_format)
+
+            if not files_dict[filename].is_pvs:
+                files_dict[filename].row_inc()
+                files_dict[filename].add_pvs(shcell_format)
+
+            warn.write_to_book(files_dict[filename].worksheet, files_dict[filename].get_row())
+            statistics.add_warning(warn)
+            files_dict[filename].row_inc()
+        pvs_report.close()
+
     # generate separate list for statistics
     statistics_wb = workbook.add_worksheet("Total")
 
     row = 1
-    statistics_wb.set_column('A:C', 50)
+    statistics_wb.set_column('A:C', 80)
     statistics_wb.write(0, 0, "ID", hcell_format)
     statistics_wb.write(0, 1, "Repeats", hcell_format)
     for key in statistics.by_id.keys():
@@ -153,17 +236,12 @@ if __name__ == "__main__":
     row += 1
 
     for key in statistics.by_file.keys():
-        statistics_wb.write(row, 0, key, hcell_format)
+        statistics_wb.write(row, 0, key, shcell_format)
         row += 1
         for id in statistics.by_file[key].keys():
             statistics_wb.write(row, 0, id)
             statistics_wb.write(row, 1, statistics.by_file[key][id])
             row += 1
+
     workbook.close()
-
-
-
-
-
-
 
