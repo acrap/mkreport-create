@@ -1,18 +1,35 @@
 import xlsxwriter
-import sys
+import argparse
 from cwstatistics import CWStatistics
 from pvs_analyze import analyze_pvs_report
 from make_analyze import makefile_analyze
 from summary_creator import create_summary, create_summary_diff
 
 if __name__ == "__main__":
-    pvs_report1 = open("pvs_report.csv")
-    pvs_report2 = open("pvs_report_new.csv")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-makeout1", help="GNU make output for the previous state",
+                        type=str)
+    parser.add_argument("-makeout2", help="GNU make output for the current state",
+                        type=str)
+
+    parser.add_argument("-pvs1", help="PVS csv report for the previous state",
+                        type=str)
+
+    parser.add_argument("-pvs2", help="PVS csv report for the current state",
+                        type=str)
+
+    parser.add_argument("--out", help="Output file",
+                        type=str, default='SummaryDiff.xlsx', required=False)
+
+    args = parser.parse_args()
+
+    pvs_report1 = open(args.pvs1)
+    pvs_report2 = open(args.pvs2)
 
     statistics = CWStatistics()
     statistics2 = CWStatistics()
 
-    workbook = xlsxwriter.Workbook('SummaryDiff.xlsx')
+    workbook = xlsxwriter.Workbook(args.out)
 
     hcell_format = workbook.add_format()
 
@@ -30,8 +47,8 @@ if __name__ == "__main__":
     # Set the columns widths.
     extwsheet_dict = dict()
 
-    makefile_analyze("warnings", extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=True)
-    makefile_analyze("warnings_new", extwsheet_dict, workbook, statistics2, hcell_format, shcell_format, only_stat=True)
+    makefile_analyze(args.makeout1, extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=True)
+    makefile_analyze(args.makeout2, extwsheet_dict, workbook, statistics2, hcell_format, shcell_format, only_stat=True)
 
     analyze_pvs_report(workbook, pvs_report1, hcell_format,
                        shcell_format, extwsheet_dict, statistics, only_stat=True)
