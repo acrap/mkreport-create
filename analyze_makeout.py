@@ -116,6 +116,13 @@ class WorksheetExt:
     def is_pvs_added(self):
         return self.is_pvs
 
+    def add_header_row(self, hlist, hformat):
+        column = 0
+        for item in hlist:
+            self.worksheet.write(self.row, column, item, hformat)
+            column += 1
+        self.row_inc()
+
     def add_subheader(self, text, cformat):
         self.row_inc()
         self.worksheet.write(self.row, 0, text, cformat)
@@ -173,15 +180,10 @@ if __name__ == "__main__":
                 place = place[start_ind:place.index(":")]
 
                 if place not in files_dict:
-                    row = 1
                     sheet = workbook.add_worksheet(place)
                     files_dict[place] = WorksheetExt(sheet)
                     files_dict[place].worksheet.set_column('A:G', 50)
-                    files_dict[place].worksheet.write(0, 0, "id", hcell_format)
-                    files_dict[place].worksheet.write(0, 1, "desc", hcell_format)
-                    files_dict[place].worksheet.write(0, 2, "place", hcell_format)
-                    files_dict[place].worksheet.write(0, 3, "source", hcell_format)
-                    files_dict[place].row_inc()
+                    files_dict[place].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
                     files_dict[place].add_subheader("Compiler warnings:", shcell_format)
 
                 id = CWarning.get_id(line)
@@ -200,18 +202,13 @@ if __name__ == "__main__":
             if warn is None:
                 continue
             filename = CWarning.get_filename(warn.place)
-            if not filename in files_dict:
-                row = 1
+            if filename not in files_dict:
                 sheet = workbook.add_worksheet(filename)
                 files_dict[filename] = WorksheetExt(sheet)
                 files_dict[filename].worksheet.set_column('A:G', 50)
-                files_dict[filename].worksheet.write(0, 0, "id", hcell_format)
-                files_dict[filename].worksheet.write(0, 1, "desc", hcell_format)
-                files_dict[filename].worksheet.write(0, 2, "place", hcell_format)
-                files_dict[filename].worksheet.write(0, 3, "source", hcell_format)
+                files_dict[filename].add_header_row(["Id", "Desc", "Place", "Source"], hcell_format)
 
             if not files_dict[filename].is_pvs:
-                files_dict[filename].row_inc()
                 files_dict[filename].add_pvs(shcell_format)
 
             warn.write_to_book(files_dict[filename].worksheet, files_dict[filename].get_row())
