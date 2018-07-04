@@ -3,29 +3,7 @@ import sys
 from cwarning import CWarning
 from cwstatistics import CWStatistics
 from worksheet_ext import WorksheetExt
-from pvs_analyze import analyze_pvs_report_line
-
-
-def add_pvs_warnings_to_report(wbook, report_file, header_format, subheader_format, worksheet_dict, stats, only_stat):
-    pvs_lines = report_file.readlines()
-    for line in pvs_lines[2:]:
-        warn = analyze_pvs_report_line(line)
-        if warn is None:
-            continue
-        filename = CWarning.get_filename(warn.place)
-        if not only_stat:
-            if filename not in extwsheet_dict:
-                sheet = wbook.add_worksheet(filename)
-                worksheet_dict[filename] = WorksheetExt(sheet)
-                worksheet_dict[filename].worksheet.set_column('A:G', 50)
-                worksheet_dict[filename].add_header_row(["Id", "Desc", "Place", "Source"], header_format)
-
-            if not extwsheet_dict[filename].is_pvs:
-                extwsheet_dict[filename].add_pvs(subheader_format)
-
-            warn.write_to_book(extwsheet_dict[filename].worksheet, extwsheet_dict[filename].get_row())
-        stats.add_warning(warn)
-        extwsheet_dict[filename].row_inc()
+from pvs_analyze import add_pvs_warnings_to_report
 
 
 if __name__ == "__main__":
