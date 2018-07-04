@@ -220,7 +220,9 @@ if __name__ == "__main__":
     statistics_wb = workbook.add_worksheet("Total")
 
     row = 1
-    statistics_wb.set_column('A:C', 80)
+    statistics_wb.set_column('A:A', 30)
+    statistics_wb.set_column('B:C', 80)
+
     statistics_wb.write(0, 0, "ID", hcell_format)
     statistics_wb.write(0, 1, "Repeats", hcell_format)
     for key in statistics.by_id.keys():
@@ -229,15 +231,15 @@ if __name__ == "__main__":
         row += 1
 
     statistics_wb.write(row, 0, "FILE", hcell_format)
-    statistics_wb.write(row, 1, "Warnings", hcell_format)
+    statistics_wb.write(row, 1, "Warning", hcell_format)
+    statistics_wb.write(row, 2, "Repeats", hcell_format)
     row += 1
 
     for key in statistics.by_file.keys():
-        statistics_wb.write(row, 0, key, shcell_format)
-        row += 1
+        statistics_wb.write(row, 0, key)
         for id in statistics.by_file[key].keys():
-            statistics_wb.write(row, 0, id)
-            statistics_wb.write(row, 1, statistics.by_file[key][id])
+            statistics_wb.write(row, 1, id)
+            statistics_wb.write(row, 2, statistics.by_file[key][id])
             row += 1
 
     workbook.close()
