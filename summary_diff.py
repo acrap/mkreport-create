@@ -58,6 +58,7 @@ if __name__ == "__main__":
                        shcell_format, extwsheet_dict, statistics2, only_stat=True)
     pvs_report2.close()
 
-    create_summary_diff(workbook, hcell_format, statistics, statistics2)
+    wsheet_summary_diff = workbook.add_worksheet("Summary")
+    create_summary_diff(workbook, wsheet_summary_diff, hcell_format, statistics, statistics2)
     workbook.close()
 

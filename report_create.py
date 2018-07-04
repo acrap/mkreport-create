@@ -22,6 +22,7 @@ if __name__ == "__main__":
     statistics = CWStatistics()
 
     workbook = xlsxwriter.Workbook(args.out)
+    wsheet_summary_diff = workbook.add_worksheet("Summary")
 
     hcell_format = workbook.add_format()
 
@@ -46,5 +47,5 @@ if __name__ == "__main__":
                            shcell_format, extwsheet_dict, statistics, only_stat=False)
         pvs_report.close()
 
-    create_summary(workbook, hcell_format, statistics)
+    create_summary(workbook, wsheet_summary_diff, hcell_format, statistics)
     workbook.close()
