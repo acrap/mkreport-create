@@ -41,4 +41,5 @@ def analyze_pvs_report(wbook, report_file, header_format, subheader_format, work
 
             warn.write_to_book(worksheet_dict[filename].worksheet, worksheet_dict[filename].get_row())
         stats.add_warning(warn)
-        worksheet_dict[filename].row_inc()
+        if not only_stat:
+            worksheet_dict[filename].row_inc()
