@@ -3,7 +3,7 @@ import argparse
 from cwstatistics import CWStatistics
 from pvs_analyze import analyze_pvs_report
 from make_analyze import makefile_analyze
-from summary_creator import create_summary, create_summary_diff
+from summary_creator import create_summary_diff
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

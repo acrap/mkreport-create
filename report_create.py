@@ -1,21 +1,27 @@
 import xlsxwriter
-import sys
+import argparse
 from cwstatistics import CWStatistics
 from pvs_analyze import analyze_pvs_report
 from make_analyze import makefile_analyze
 from summary_creator import create_summary
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-makeout", help="GNU make output",
+                        type=str)
+    parser.add_argument("--pvs", help="PVS csv report",
+                        type=str, default=None)
+    parser.add_argument("--out", help="Output file",
+                        type=str, default='report.xlsx', required=False)
+    args = parser.parse_args()
     pvs_report = None
-    if len(sys.argv) < 2:
-        print("pass path to make output file as argument")
-        sys.exit(1)
-    if len(sys.argv) > 2:
-        pvs_report = open(sys.argv[2], "r")
+
+    if args.pvs is not None:
+        pvs_report = open(args.pvs, "r")
 
     statistics = CWStatistics()
 
-    workbook = xlsxwriter.Workbook('Report.xlsx')
+    workbook = xlsxwriter.Workbook(args.out)
 
     hcell_format = workbook.add_format()
 
@@ -33,7 +39,7 @@ if __name__ == "__main__":
     # Set the columns widths.
     extwsheet_dict = dict()
 
-    makefile_analyze(sys.argv[1], extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=False)
+    makefile_analyze(args.makeout, extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=False)
 
     if pvs_report is not None:
         analyze_pvs_report(workbook, pvs_report, hcell_format,
@@ -42,4 +48,3 @@ if __name__ == "__main__":
 
     create_summary(workbook, hcell_format, statistics)
     workbook.close()
-

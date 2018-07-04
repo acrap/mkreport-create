@@ -73,6 +73,7 @@ def create_summary_diff(workbook, hcell_format, statistics, statistics2):
     statistics_wb.write(0, 0, "ID", hcell_format)
     statistics_wb.write(0, 1, "Repeats", hcell_format)
     statistics_wb.write(0, 2, "Current", hcell_format)
+    statistics_wb.write(0, 3, "Progress", hcell_format)
     all_keys = list(statistics.by_id.keys())
     for item in statistics2.by_id.keys():
         if item not in all_keys:
@@ -98,6 +99,7 @@ def create_summary_diff(workbook, hcell_format, statistics, statistics2):
     statistics_wb.write(row, 1, "Warning", hcell_format)
     statistics_wb.write(row, 2, "Repeats", hcell_format)
     statistics_wb.write(row, 3, "Current", hcell_format)
+    statistics_wb.write(row, 4, "Progress", hcell_format)
     row += 1
 
     current_format = format1
