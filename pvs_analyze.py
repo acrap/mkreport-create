@@ -35,6 +35,8 @@ def analyze_pvs_report(wbook, report_file, header_format, subheader_format, work
                 worksheet_dict[filename] = WorksheetExt(sheet)
                 worksheet_dict[filename].worksheet.set_column('A:G', 50)
                 worksheet_dict[filename].add_header_row(["Id", "Desc", "Place", "Source"], header_format)
+                worksheet_dict[filename].worksheet.write(worksheet_dict[filename].get_row(), 0, 'internal:Summary')
+                worksheet_dict[filename].row_inc()
 
             if not worksheet_dict[filename].is_pvs:
                 worksheet_dict[filename].add_pvs(subheader_format)
