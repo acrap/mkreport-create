@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Set the columns widths.
     extwsheet_dict = dict()
 
-    makefile_analyze(sys.argv[1], extwsheet_dict, workbook, statistics, hcell_format, shcell_format)
+    makefile_analyze(sys.argv[1], extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=False)
 
     if pvs_report is not None:
         analyze_pvs_report(workbook, pvs_report, hcell_format,
