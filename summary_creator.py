@@ -33,7 +33,7 @@ def create_summary(workbook, wsheet, hcell_format, statistics):
     current_format = format1
 
     for key in statistics.by_file.keys():
-        statistics_wsheet.write(row, 0, key, current_format)
+        statistics_wsheet.write(row, 0, 'internal:{key}'.format(key=key), current_format)
         for id in statistics.by_file[key].keys():
             statistics_wsheet.write(row, 1, id, current_format)
             statistics_wsheet.write(row, 2, statistics.by_file[key][id], current_format)
