@@ -35,10 +35,13 @@ def create_summary(workbook, wsheet, hcell_format, statistics):
     format2.set_border_color("#000000")
 
     current_format = format1
-
-    for key in statistics.by_file.keys():
+    keys = list(statistics.by_file.keys())
+    keys.sort(key=lambda s: s.lower())
+    for key in keys:
         statistics_wsheet.write(row, 0, 'internal:{key}'.format(key=key), current_format)
-        for id in statistics.by_file[key].keys():
+        ids = list(statistics.by_file[key].keys())
+        ids.sort(key=lambda s: s.lower())
+        for id in ids:
             statistics_wsheet.write(row, 1, id, current_format)
             statistics_wsheet.write(row, 2, statistics.by_file[key][id], current_format)
             row += 1
@@ -81,6 +84,7 @@ def create_summary_diff(workbook, wsheet, hcell_format, statistics, statistics2)
     for item in statistics2.by_id.keys():
         if item not in all_keys:
             all_keys.append(item)
+    all_keys.sort(key=lambda s: s.lower())
 
     for key in all_keys:
         val1 = 0
@@ -122,6 +126,8 @@ def create_summary_diff(workbook, wsheet, hcell_format, statistics, statistics2)
         if item not in all_keys:
             all_keys.append(item)
 
+    all_keys.sort(key=lambda s: s.lower())
+
     for key in all_keys:
         statistics_wb.write(row, 0, key, current_format)
         if key not in statistics.by_file:
@@ -132,6 +138,7 @@ def create_summary_diff(workbook, wsheet, hcell_format, statistics, statistics2)
             for item in statistics2.by_file[key]:
                 if item not in all_id:
                     all_id.append(item)
+        all_id.sort(key=lambda s: s.lower())
         for id in all_id:
             val1 = 0
             val2 = 0
