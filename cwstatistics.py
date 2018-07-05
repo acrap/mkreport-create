@@ -26,6 +26,3 @@ class CWStatistics:
         else:
             self.by_file[filename][cwarning.id] += 1
         self.total += 1
-
-    def get_total(self):
-        return self.total
