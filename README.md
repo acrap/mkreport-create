@@ -13,7 +13,7 @@ use:
 
 ## Usage
 
-### mkreport-create
+### mkreport_create
 ```
 usage: mkreport_create.py [-h] -makeout MAKEOUT [--pvs PVS] [--out OUT]
 
@@ -26,9 +26,9 @@ required arguments:
   -makeout MAKEOUT  GNU make output
 ```
 
-### summary-diff
+### mksummary_diff
 ```
-usage: summary_diff.py [-h] -makeout1 MAKEOUT1 -makeout2 MAKEOUT2 [-pvs1 PVS1]
+usage: mksummary_diff.py [-h] -makeout1 MAKEOUT1 -makeout2 MAKEOUT2 [-pvs1 PVS1]
                        [-pvs2 PVS2] [--out OUT]
 
 optional arguments:

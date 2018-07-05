@@ -11,7 +11,7 @@ setup(
 
     scripts=[
         os.path.join('bin', 'mkreport_create.py'),
-        os.path.join('bin', 'summary_diff.py')
+        os.path.join('bin', 'mksummary_diff.py')
     ],
 
     install_requires=[
