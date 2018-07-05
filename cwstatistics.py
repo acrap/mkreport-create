@@ -23,5 +23,5 @@ class CWStatistics:
 
         if cwarning.id not in self.by_file[filename]:
             self.by_file[filename][cwarning.id] = 1
-
-        self.by_file[filename][cwarning.id] += 1
+        else:
+            self.by_file[filename][cwarning.id] += 1
