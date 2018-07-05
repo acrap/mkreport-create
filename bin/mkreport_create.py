@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 import xlsxwriter
 import argparse
-from cwstatistics import CWStatistics
-from pvs_analyze import analyze_pvs_report
-from make_analyze import makefile_analyze
-from summary_creator import create_summary
+from mkreport_lib.cwstatistics import CWStatistics
+from mkreport_lib.pvs_analyze import analyze_pvs_report
+from mkreport_lib.make_analyze import makefile_analyze
+from mkreport_lib.summary_creator import create_summary
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

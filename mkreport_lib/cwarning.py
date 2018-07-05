@@ -1,5 +1,3 @@
-import xlsxwriter
-
 cwarning_uniq = dict()
 
 

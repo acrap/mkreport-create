@@ -1,5 +1,5 @@
-from cwarning import CWarning
-from worksheet_ext import WorksheetExt
+from mkreport_lib.cwarning import CWarning
+from mkreport_lib.worksheet_ext import WorksheetExt
 
 
 def makefile_analyze(filename, extwsheet_dict, workbook, statistics, hformat, shformat, only_stat):

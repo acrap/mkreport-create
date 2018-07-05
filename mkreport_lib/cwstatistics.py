@@ -1,4 +1,4 @@
-from cwarning import CWarning
+from mkreport_lib.cwarning import CWarning
 
 
 class CWStatistics:
