@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import xlsxwriter
 import argparse
 from cwstatistics import CWStatistics
@@ -7,10 +8,11 @@ from summary_creator import create_summary_diff
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-makeout1", help="GNU make output for the previous state",
-                        type=str)
-    parser.add_argument("-makeout2", help="GNU make output for the current state",
-                        type=str)
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-makeout1", help="GNU make output for the previous state",
+                        type=str, required=True)
+    required.add_argument("-makeout2", help="GNU make output for the current state",
+                        type=str, required=True)
 
     parser.add_argument("-pvs1", help="PVS csv report for the previous state",
                         type=str)

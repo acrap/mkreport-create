@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import xlsxwriter
 import argparse
 from cwstatistics import CWStatistics
@@ -7,8 +8,9 @@ from summary_creator import create_summary
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-makeout", help="GNU make output",
-                        type=str)
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-makeout", help="GNU make output",
+                        type=str, required=True)
     parser.add_argument("--pvs", help="PVS csv report",
                         type=str, default=None)
     parser.add_argument("--out", help="Output file",
