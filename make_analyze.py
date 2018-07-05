@@ -21,9 +21,11 @@ def makefile_analyze(filename, extwsheet_dict, workbook, statistics, hformat, sh
                             sheet = workbook.add_worksheet(place)
                             extwsheet_dict[place] = WorksheetExt(sheet)
                             extwsheet_dict[place].worksheet.set_column('A:G', 50)
-                            extwsheet_dict[place].add_header_row(["Id", "Desc", "Place", "Source"], hformat)
-                            extwsheet_dict[place].worksheet.write(extwsheet_dict[place].get_row(), 0, 'internal:Summary')
+                            extwsheet_dict[place].worksheet.write(extwsheet_dict[place].get_row(), 0,
+                                                                  'internal:Summary')
                             extwsheet_dict[place].row_inc()
+                            extwsheet_dict[place].add_header_row(["Id", "Desc", "Place", "Source"], hformat)
+
                             extwsheet_dict[place].add_subheader("Compiler warnings:", shformat)
 
                     id = CWarning.get_id(line)
