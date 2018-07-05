@@ -14,6 +14,10 @@ def create_summary(workbook, wsheet, hcell_format, statistics):
         statistics_wsheet.write(row, 1, statistics.by_id[key])
         row += 1
 
+    statistics_wsheet.write(row, 0, "TOTAL:")
+    statistics_wsheet.write(row, 1, statistics.total)
+    row += 1
+
     statistics_wsheet.write(row, 0, "FILE", hcell_format)
     statistics_wsheet.write(row, 1, "Warning", hcell_format)
     statistics_wsheet.write(row, 2, "Repeats", hcell_format)
@@ -94,6 +98,16 @@ def create_summary_diff(workbook, wsheet, hcell_format, statistics, statistics2)
             statistics_wb.write(row, 3, "+{diff}".format(diff=(val2-val1)), format_plus)
         row += 1
 
+    statistics_wb.write(row, 0, "TOTAL:")
+    statistics_wb.write(row, 1, statistics.total)
+    statistics_wb.write(row, 2, statistics2.total)
+
+    if statistics.total > statistics2.total:
+        statistics_wb.write(row, 3, "-{diff}".format(diff=(statistics.total - statistics2.total)), format_minus)
+    elif statistics2.total > statistics.total:
+        statistics_wb.write(row, 3, "+{diff}".format(diff=(statistics2.total - statistics.total)), format_plus)
+
+    row += 1
     statistics_wb.write(row, 0, "FILE", hcell_format)
     statistics_wb.write(row, 1, "Warning", hcell_format)
     statistics_wb.write(row, 2, "Repeats", hcell_format)

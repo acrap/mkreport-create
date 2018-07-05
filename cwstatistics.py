@@ -1,4 +1,3 @@
-import xlsxwriter
 from cwarning import CWarning
 
 
@@ -6,6 +5,7 @@ class CWStatistics:
     def __init__(self):
         self.by_id = dict()
         self.by_file = dict()
+        self.total = 0
 
     def add_warning(self, cwarning):
         # add description to PVS warnings id's
@@ -25,3 +25,7 @@ class CWStatistics:
             self.by_file[filename][cwarning.id] = 1
         else:
             self.by_file[filename][cwarning.id] += 1
+        self.total += 1
+
+    def get_total(self):
+        return self.total
