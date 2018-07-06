@@ -5,6 +5,7 @@ from mkreport_lib.cwstatistics import CWStatistics
 from mkreport_lib.pvs_analyze import analyze_pvs_report
 from mkreport_lib.make_analyze import makefile_analyze
 from mkreport_lib.summary_creator import create_summary_diff
+from mkreport_lib.cwarning import cwarning_uniq
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -50,6 +51,9 @@ if __name__ == "__main__":
     extwsheet_dict = dict()
 
     makefile_analyze(args.makeout1, extwsheet_dict, workbook, statistics, hcell_format, shcell_format, only_stat=True)
+
+    cwarning_uniq.clear()
+
     makefile_analyze(args.makeout2, extwsheet_dict, workbook, statistics2, hcell_format, shcell_format, only_stat=True)
 
     analyze_pvs_report(workbook, pvs_report1, hcell_format,
