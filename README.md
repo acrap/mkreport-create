@@ -10,6 +10,10 @@ use:
 ```
     pip3 install XlsxWriter
 ```
+## Installation
+```
+python3 setup.py install
+```
 
 ## Usage
 
