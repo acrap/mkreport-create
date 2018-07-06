@@ -3,7 +3,7 @@ import os
 
 setup(
     name='mkreport_create',
-    version='0.3',
+    version='0.5',
     packages=find_packages(),
     long_description="The Python3 script can be used to make reports from makefile output and PVS Studio csv reports",
     author = "Andrey Strunin",
